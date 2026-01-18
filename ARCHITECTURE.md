@@ -142,17 +142,99 @@ Byte 7:     '\n'          (0x0A) - Stop character
 
 ---
 
-## ESP32 Dev Board v2 Pin Assignments
+## ESP32 DOIT DevKit v1 (30-Pin) Pin Assignments
 
-> **TODO**: Update with actual ESP32 pinout once provided
+**Board**: ESP-WROOM-32 based, 30 GPIO pins
 
-| Function | ESP32 Pin | Notes |
-|----------|-----------|-------|
-| UART TX (to MASTER) | TBD | Connect to MASTER PB7 |
-| Joystick X | TBD | Analog input |
-| Joystick Y | TBD | Analog input |
-| Buzzer/Speaker | TBD | PWM output |
-| BLE/WiFi | Built-in | Phone app control |
+### Pinout Reference
+```
+                    ┌───────────────┐
+                    │   ESP32 DOIT  │
+                    │   DevKit v1   │
+                    │    (30-Pin)   │
+            ┌───────┴───────────────┴───────┐
+      3.3V  │ [3V3]                  [VIN] │  5V Input
+       EN   │ [EN]                   [GND] │  GND
+ADC2_CH6    │ [VP/36]               [D23] │  VSPI MOSI
+ADC2_CH3    │ [VN/39]               [D22] │  I2C SCL
+      34    │ [D34]                  [TX0] │  UART0 TX (prog)
+      35    │ [D35]                  [RX0] │  UART0 RX (prog)
+      32    │ [D32]                  [D21] │  I2C SDA
+      33    │ [D33]                  [D19] │  VSPI MISO
+      25    │ [D25]                  [D18] │  VSPI CLK
+      26    │ [D26]                   [D5] │  VSPI CS
+      27    │ [D27]                  [D17] │  UART2 TX ◄── HOVERBOARD
+      14    │ [D14]                  [D16] │  UART2 RX
+      12    │ [D12]                   [D4] │  ADC/Touch
+     GND    │ [GND]                   [D2] │  Onboard LED
+      13    │ [D13]                  [D15] │  PWM/Touch
+            └───────────────────────────────┘
+                       │  USB  │
+                       └───────┘
+```
+
+### Selected Pin Assignments for HoverChair
+
+| Function | ESP32 Pin | GPIO | Notes |
+|----------|-----------|------|-------|
+| **UART TX (to MASTER)** | D17 | GPIO17 | UART2 TX → MASTER PB7 (steering RX) |
+| **UART RX (from MASTER)** | D16 | GPIO16 | UART2 RX ← MASTER PB6 (optional telemetry) |
+| **Joystick X** | D34 | GPIO34 | ADC1_CH6 - Input only, no pullup needed |
+| **Joystick Y** | D35 | GPIO35 | ADC1_CH7 - Input only, no pullup needed |
+| **Joystick Button** | D32 | GPIO32 | Digital input with internal pullup |
+| **Buzzer/Speaker** | D25 | GPIO25 | DAC1 - Can output analog or PWM tones |
+| **Status LED** | D2 | GPIO2 | Onboard LED for status indication |
+| **BLE/WiFi** | - | Built-in | ESP32 integrated radio |
+
+### Pin Selection Rationale
+
+1. **UART2 (GPIO16/17)**: Dedicated hardware UART, leaves UART0 free for USB debugging
+2. **GPIO34/35 for Joystick**: Input-only pins, perfect for analog joystick (won't accidentally drive outputs)
+3. **GPIO25 for Buzzer**: Has DAC capability for smoother tones, or can use PWM
+4. **GPIO32 for Button**: Has internal pullup, good for simple button input
+
+### Pins to AVOID
+
+| Pin | Reason |
+|-----|--------|
+| GPIO0, 2, 15 | Boot strapping pins - can cause upload issues |
+| GPIO6-11 | Connected to internal SPI flash |
+| GPIO1, 3 | UART0 used for programming/debug |
+| ADC2 pins (when WiFi active) | WiFi uses ADC2 internally |
+
+---
+
+## Wiring Diagram
+
+```
+                          ┌─────────────────────────────────┐
+                          │      ESP32 DOIT DevKit v1       │
+                          │            (30-Pin)             │
+                          │                                 │
+    Joystick X ──────────►│ GPIO34 (ADC)                   │
+    Joystick Y ──────────►│ GPIO35 (ADC)                   │
+    Joystick BTN ────────►│ GPIO32                         │
+                          │                                 │
+    Piezo Buzzer (+) ◄────│ GPIO25 (DAC)───[220Ω]──►Buzzer │
+                          │                                 │
+    Status LED ◄──────────│ GPIO2 (onboard)                │
+                          │                                 │
+    To MASTER PB7 ◄───────│ GPIO17 (UART2 TX)              │
+    From MASTER PB6 ──────►│ GPIO16 (UART2 RX) (optional)  │
+                          │                                 │
+    5V (from MASTER) ─────►│ VIN                           │
+    GND ──────────────────►│ GND                           │
+                          └─────────────────────────────────┘
+
+           Joystick (2-axis + button)
+           ┌─────────────────────────┐
+           │  VCC ──────► 3.3V       │
+           │  GND ──────► GND        │
+           │  VRx ──────► GPIO34     │
+           │  VRy ──────► GPIO35     │
+           │  SW  ──────► GPIO32     │
+           └─────────────────────────┘
+```
 
 ---
 
