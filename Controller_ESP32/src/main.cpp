@@ -19,8 +19,8 @@
 #define JOY_Y_CENTER 1803 
 #define DEADZONE 150      
 #define MAX_SPEED 1000    
-const char* ssid = ":]";
-const char* password = "qwertasdf";
+const char* ssid = "your_wifi_ssid";
+const char* password = "your_wifi_password";
 
 BluetoothSerial SerialBT;
 
