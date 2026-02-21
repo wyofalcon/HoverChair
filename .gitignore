@@ -1,0 +1,24 @@
+# Environment variables
+.env
+.env.*
+!.env.template
+!.env.example
+
+# Build artifacts
+Firmware_GD32/build/
+Firmware_GD32/Listings/
+
+# Keil uVision user-specific files
+*.uvguix.*
+*.scvd
+Firmware_GD32/RTE/
+
+# PlatformIO
+Controller_ESP32/.pio/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
